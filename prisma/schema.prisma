@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+model User{
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName String?
+  email String
+  hashedPassword String
+  userinteraction Userinteraction []
+}
+// relation between user and userinteraction is 1 to many i.e. a single user can have multiple userinteraction
+model Userinteraction{
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  action Action
+  userId String @db.ObjectId
+  user User     @relation(fields: [userId],references: [id],onDelete:Cascade) 
+}
+//relation between userinteraction and news is many to many 
+model News {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  url String @unique
+  title String
+  description String
+  content String?
+  source String?
+  publishedAt DateTime
+  imageUrl String?
+  category String?
+  embedding Float[] 
+  importedAt DateTime @default(now())
+}
+
+enum Action{
+  View
+  Like
+  Dislike
+  Saved
+}

@@ -1,0 +1,13 @@
+import { PrismaClient } from '../generated/prisma';
+
+// Extend the global object to include the PrismaClient instance
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+
+export const prisma = globalThis.prisma || new PrismaClient();
+
+// In development mode, ensure the PrismaClient instance is not recreated
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma;
+}
